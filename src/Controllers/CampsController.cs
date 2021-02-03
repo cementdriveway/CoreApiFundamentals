@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace CoreCodeCamp.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/[controller]"), ApiController]
     public class CampsController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -74,6 +73,11 @@ namespace CoreCodeCamp.Controllers
         {
             try
             {
+                if (await this._repository.GetCampAsync(campModel.Moniker) != null)
+                {
+                    return BadRequest("Moniker in use");
+                }
+
                 string location = this.linkGenerator.GetPathByAction("Get", "Camps", new {moniker = campModel.Moniker});
 
                 if (string.IsNullOrEmpty(location))
