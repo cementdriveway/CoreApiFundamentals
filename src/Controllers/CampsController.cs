@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CoreCodeCamp.Data;
@@ -43,6 +44,20 @@ namespace CoreCodeCamp.Controllers
                 Camp result = await this._repository.GetCampAsync(moniker);
 
                 return result != null ? this._mapper.Map<CampModel>(result) : NotFound();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<CampModel[]>> SearchByDate(DateTime theDate, bool includeTalks = false)
+        {
+            try
+            {
+                Camp[] result = await this._repository.GetAllCampsByEventDate(theDate, includeTalks);
+                return result.Any() ? this._mapper.Map<CampModel[]>(result) : NotFound();
             }
             catch (Exception)
             {
