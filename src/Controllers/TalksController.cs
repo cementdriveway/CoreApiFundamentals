@@ -36,5 +36,20 @@ namespace CoreCodeCamp.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<TalkModel>> Get(string moniker, int id, bool includeSpeaker = false)
+        {
+            try
+            {
+                Talk talk = await this._campRepository.GetTalkByMonikerAsync(moniker, id, includeSpeaker);
+
+                return this._mapper.Map<TalkModel>(talk);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+        }
     }
 }
