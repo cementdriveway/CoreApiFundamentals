@@ -13,23 +13,23 @@ namespace CoreCodeCamp.Controllers
     [Route("api/[controller]"), ApiController]
     public class CampsController : ControllerBase
     {
+        private readonly ICampRepository _campRepository;
+        private readonly LinkGenerator _linkGenerator;
         private readonly IMapper _mapper;
-        private readonly ICampRepository _repository;
-        private readonly LinkGenerator linkGenerator;
 
-        public CampsController(ICampRepository repository, IMapper mapper, LinkGenerator linkGenerator)
+        public CampsController(ICampRepository campRepository, IMapper mapper, LinkGenerator linkGenerator)
         {
-            this._repository = repository;
+            this._campRepository = campRepository;
             this._mapper = mapper;
-            this.linkGenerator = linkGenerator;
+            this._linkGenerator = linkGenerator;
         }
 
-        // GET
+        [HttpGet]
         public async Task<ActionResult<CampModel[]>> Get(bool includeTalks = false)
         {
             try
             {
-                Camp[] result = await this._repository.GetAllCampsAsync(includeTalks);
+                Camp[] result = await this._campRepository.GetAllCampsAsync(includeTalks);
 
                 return this._mapper.Map<CampModel[]>(result);
             }
@@ -44,7 +44,7 @@ namespace CoreCodeCamp.Controllers
         {
             try
             {
-                Camp result = await this._repository.GetCampAsync(moniker);
+                Camp result = await this._campRepository.GetCampAsync(moniker);
 
                 return result != null ? this._mapper.Map<CampModel>(result) : NotFound();
             }
@@ -59,7 +59,7 @@ namespace CoreCodeCamp.Controllers
         {
             try
             {
-                Camp[] result = await this._repository.GetAllCampsByEventDate(theDate, includeTalks);
+                Camp[] result = await this._campRepository.GetAllCampsByEventDate(theDate, includeTalks);
                 return result.Any() ? this._mapper.Map<CampModel[]>(result) : NotFound();
             }
             catch (Exception)
@@ -73,23 +73,23 @@ namespace CoreCodeCamp.Controllers
         {
             try
             {
-                if (await this._repository.GetCampAsync(campModel.Moniker) != null)
+                if (await this._campRepository.GetCampAsync(campModel.Moniker) != null)
                 {
                     return BadRequest("Moniker in use");
                 }
 
-                string location = this.linkGenerator.GetPathByAction("Get", "Camps", new {moniker = campModel.Moniker});
+                string location = this._linkGenerator.GetPathByAction("Get", "Camps", new {moniker = campModel.Moniker});
 
                 if (string.IsNullOrEmpty(location))
                 {
                     return BadRequest("Could not use current moniker");
                 }
 
-                this._repository.Add(this._mapper.Map<Camp>(campModel));
+                this._campRepository.Add(this._mapper.Map<Camp>(campModel));
 
-                if (await this._repository.SaveChangesAsync())
+                if (await this._campRepository.SaveChangesAsync())
                 {
-                    return Created(location, this._mapper.Map<CampModel>(await this._repository.GetCampAsync(campModel.Moniker)));
+                    return Created(location, this._mapper.Map<CampModel>(await this._campRepository.GetCampAsync(campModel.Moniker)));
                 }
             }
             catch (Exception)
@@ -105,7 +105,7 @@ namespace CoreCodeCamp.Controllers
         {
             try
             {
-                Camp oldCamp = await this._repository.GetCampAsync(moniker);
+                Camp oldCamp = await this._campRepository.GetCampAsync(moniker);
 
                 if (oldCamp == null)
                 {
@@ -114,7 +114,7 @@ namespace CoreCodeCamp.Controllers
 
                 this._mapper.Map(campModel, oldCamp);
 
-                if (await this._repository.SaveChangesAsync())
+                if (await this._campRepository.SaveChangesAsync())
                 {
                     return this._mapper.Map<CampModel>(oldCamp);
                 }
@@ -132,16 +132,16 @@ namespace CoreCodeCamp.Controllers
         {
             try
             {
-                Camp oldCamp = await this._repository.GetCampAsync(moniker);
+                Camp oldCamp = await this._campRepository.GetCampAsync(moniker);
 
                 if (oldCamp == null)
                 {
                     return NotFound($"Could not find camp with moniker {moniker}");
                 }
 
-                this._repository.Delete(oldCamp);
+                this._campRepository.Delete(oldCamp);
 
-                if (await this._repository.SaveChangesAsync())
+                if (await this._campRepository.SaveChangesAsync())
                 {
                     return Ok();
                 }
