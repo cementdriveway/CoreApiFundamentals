@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace CoreCodeCamp.Controllers
 {
-    [Route("api/v{version:apiVersion}/[controller]"), ApiController, ApiVersion("1.0"), ApiVersion("1.1")]
+    [Route("api/[controller]"), ApiController, ApiVersion("1.0"), ApiVersion("1.1")]
     public class CampsController : ControllerBase
     {
         private readonly ICampRepository _campRepository;
