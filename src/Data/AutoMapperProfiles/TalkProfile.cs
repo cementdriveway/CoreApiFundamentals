@@ -8,7 +8,7 @@ namespace CoreCodeCamp
     {
         public TalkProfile()
         {
-            CreateMap<Talk, TalkModel>();
+            CreateMap<Talk, TalkModel>().ReverseMap();
         }
     }
 }

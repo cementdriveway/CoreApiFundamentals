@@ -8,7 +8,7 @@ namespace CoreCodeCamp
     {
         public SpeakerProfile()
         {
-            CreateMap<Speaker, SpeakerModel>();
+            CreateMap<Speaker, SpeakerModel>().ReverseMap();
         }
     }
 }
