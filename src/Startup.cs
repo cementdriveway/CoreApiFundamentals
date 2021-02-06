@@ -27,6 +27,11 @@ namespace CoreCodeCamp
                 opt.ApiVersionReader = ApiVersionReader.Combine(
                     new HeaderApiVersionReader("X-Version"),
                     new QueryStringApiVersionReader("api-version", "ver"));
+                // opt.Conventions.Controller<TalksController>()
+                //     .HasApiVersion(new ApiVersion(1, 0))
+                //     .HasApiVersion(new ApiVersion(1, 1))
+                //     .Action(c => c.Delete(default(string), default(int)))
+                //         .MapToApiVersion(1, 1);
             });
 
             services.AddControllers();
